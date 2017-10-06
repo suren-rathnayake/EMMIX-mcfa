@@ -1,0 +1,12 @@
+Package: EMMIXmcfa
+Type: Package
+Title: Mixture of Factor Analyzers with Common Factor Loadings
+Version: 2.0.6
+Date: 2017-10-06
+Author: Suren Rathnayake, Geoff McLachlan, Jungsun Baek
+Maintainer: Geoff McLachlan <g.mclachlan@uq.edu.au>
+Description: Fits a mixture of factor analyzers with a common component matrix for the factor loadings before the transformation of the latent factors to be white noise. It is designed specifically for the task of displaying the observed data points in a lower (q-dimensional) space, where q is the number of factors adopted in the factor-analytic representation of the observed vector.
+License: GPL (>= 2)
+Suggests: EMMIX, mvtnorm, GGally, ggplot2
+NeedsCompilation: no
+Packaged: 2017-09-21 06:07:44 UTC; uqsratha
