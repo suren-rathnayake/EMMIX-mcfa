@@ -16,7 +16,6 @@ if(any(tolower(conv_measure) == c('d', 'diff')))
 if(any(tolower(conv_measure) == c('r', 'ratio')))
   conv_measure <- 'ratio'
 
-
 ERR <- is_valid_args.mcfa(Y, g, q, itmax, nkmeans, nrandom, tol,
                           init_clust, init_para, init_method,
                           conv_measure, warn_messages)
@@ -31,6 +30,7 @@ pb <- txtProgressBar(style = 3, char = '.')
 prog <- 0
 warn_msg <- NULL
 maxLOGL <- -Inf
+# Fit a model using given initial parameter estimates
 if (!is.null(init_para)) {
 
   prog = 1/(1+nkmeans+nrandom)
@@ -58,28 +58,38 @@ if (!is.null(init_para)) {
   }
 }
 
+# Use k-means, random, and given groupings of observations
+# for parameter estimates.
 if ((nkmeans!=0) || (nrandom!=0) || (!is.null(init_clust))) {
 
+  # The set of all initial partitions 
   initial_partitions <- start_clust(Y, g, init_clust, nkmeans, nrandom)
+  
   maxinit <- ncol(initial_partitions)
   if (is.null(maxinit))
     maxinit <- 1
+  # for progress bar
   if (prog == 0) {
      prog <- 1/maxinit; tinit <- maxinit
   } else {
     prog  <- prog + 1/maxinit; tinit <- 1 + maxinit
   }
-
+  
+  # For each initial starts run EM
   for (ii in 1 : maxinit) {
 
-    if (min(table(initial_partitions[, ii]) == 1)) {
+    # For some initialization methods, having a single sample cluster
+    # can be a problem.
+    if (min(table(initial_partitions[, ii])) == 1) {
       when <- paste("At start", ii)
       what <- "Initial partitioning has a single sample cluster."
       warn_msg <- rbind(warn_msg, cbind(when, what))
       next
     }
 
-    init_model_para <- try(init_est_para.mcfa(Y, g, q, initial_partitions[, ii],
+    # Initial estimates of model parameters
+    init_model_para <- try(init_est_para.mcfa(Y, g, q, 
+                                          initial_partitions[, ii],
                                           init_method), silent = TRUE)
 
     if (class(init_model_para) == "try-error") {
@@ -89,10 +99,12 @@ if ((nkmeans!=0) || (nrandom!=0) || (!is.null(init_clust))) {
       next
     }
 
+    # EM steps
     estd_model <- est.mcfa(init_para = init_model_para, Y = Y,
-			   itmax = itmax,
-                           tol = tol, conv_measure = conv_measure)
+		                  	   itmax = itmax, tol = tol, 
+                           conv_measure = conv_measure)
 
+    # keep the model with highest log-likelihood
     if ((class(estd_model) == "mcfa")) {
       if (estd_model$logL > maxLOGL) {
         Hmodel <- estd_model
@@ -102,6 +114,7 @@ if ((nkmeans!=0) || (nrandom!=0) || (!is.null(init_clust))) {
       #               maxlogL = %8.4f \n",
       #               g, q, ii, estd_model$logL, maxLOGL))
     }
+
     if (class(estd_model) == "error") {
       when <- paste("At start", ii)
       what <- estd_model
@@ -118,7 +131,7 @@ if (!exists("Hmodel")) {
   cat("Failed to Estimate a Model. See Error Messages.")
   return(warn_msg)
 }
-
+# Make A^T A = I_q
 CH <- chol(t(Hmodel$A) %*% Hmodel$A)
 Hmodel$A <- Hmodel$A %*% solve(CH)
 Hmodel$xi <- CH %*% Hmodel$xi

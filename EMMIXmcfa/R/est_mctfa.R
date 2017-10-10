@@ -1,33 +1,32 @@
-est.mctfa <- function(init_para, Y, v, itmax, tol,
-                      df_update, conv_measure, ...) {
+est.mctfa <- function(init_para, Y, itmax, tol, conv_measure, ...) {
 
 p <- ncol(Y)
 n <- nrow(Y)
-fit <-  c(init_para, list(v = v, df_update = df_update))
 
-loglikeNtau <- try(do.call('logL_tau.mctfa',
-                            c(list(Y = Y), fit)), silent=TRUE)
+loglike_and_tau <- try(do.call('logL_tau.mctfa',
+                            c(list(Y = Y), init_para)), silent=TRUE)
 
-if ((class(loglikeNtau) == "try-error") ||
-          (class(loglikeNtau) == 'character')) {
+if ((class(loglike_and_tau) == "try-error") ||
+          (class(loglike_and_tau) == 'character')) {
   FIT <- paste('in computing the log-likelihood before EM-steps')
   class(FIT) <- "error"
   return(FIT)
 }
 
-fit <- append(fit, loglikeNtau)
+# append the list  loglike_and_tau to init_para
+init_para <- append(init_para, loglike_and_tau)
 
-if (class(fit$logL) == 'character') {
+if (class(init_para$logL) == 'character') {
 
   FIT <- paste('in computing the log-likelihood before the EM-steps,',
-                 fit$logL)
+                 init_para$logL)
   class(FIT) <- "error"
   return(FIT)
 }
 
 for (niter in 1 : itmax) {
 
-  FIT <- do.call('Mstep.mctfa', c(list(Y=Y), fit))
+  FIT <- do.call('Mstep.mctfa', c(list(Y=Y), init_para))
   if (class(FIT) == 'error') {
      FIT <- paste('in ', niter,
                    'iteration of the M-step:',
@@ -36,11 +35,11 @@ for (niter in 1 : itmax) {
      return(FIT)
   }
 
-  loglikeNtau <- try(do.call('logL_tau.mctfa', c(list(Y = Y), FIT)),
+  loglike_and_tau <- try(do.call('logL_tau.mctfa', c(list(Y = Y), FIT)),
                       silent = TRUE)
 
-  if ((class(loglikeNtau) == "try-error") ||
-                    (class(loglikeNtau) == 'character')) {
+  if ((class(loglike_and_tau) == "try-error") ||
+                    (class(loglike_and_tau) == 'character')) {
 
     FIT <- paste('in computing the log-likelihood after the ', niter,
                    'th the M-step:', FIT$logL, sep='')
@@ -48,7 +47,8 @@ for (niter in 1 : itmax) {
     return(FIT)
   }
 
-  FIT <- append(FIT, loglikeNtau)
+  # append the list  loglike_and_tau 
+  FIT <- append(FIT, loglike_and_tau)
 
   if ((class(FIT$logL)=="NULL")|| (class(FIT$logL) == 'character')) {
 
@@ -66,15 +66,16 @@ for (niter in 1 : itmax) {
     }
   }
 
-  if ((conv_measure == "diff") && (abs(FIT$logL - fit$logL) < tol))
+  if ((conv_measure == "diff") && (abs(FIT$logL - init_para$logL) < tol))
      break
 
   if ((conv_measure == "ratio") &&
-      (abs((FIT$logL - fit$logL) / FIT$logL) < tol))
+      (abs((FIT$logL - init_para$logL) / FIT$logL) < tol))
   break
 
-fit <- FIT
+init_para <- FIT
 }
+
 class(FIT) <- "mctfa"
 return(FIT)
 }

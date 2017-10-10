@@ -30,6 +30,7 @@ pb <- txtProgressBar(style = 3, char = '.')
 prog <- 0
 warn_msg <- NULL
 maxLOGL <- -Inf
+# Fit a model using given initial parameter estimates
 if (!is.null(init_para)) {
 
   prog = 1/(1+nkmeans+nrandom)
@@ -38,8 +39,11 @@ if (!is.null(init_para)) {
   if (!check_para(p, q, g, init_para, "mctfa"))
     stop("incorrect specification of init_para", .call = FALSE)
 
+  init_para <- init_para[c("g", "q", "pivec", "A", "xi", 
+                            "omega", "D", "v")]
+  init_para$df_update <- df_update
+
   estd_model <- est.mctfa(init_para = init_para, Y = Y, itmax = itmax,
-                          v = init_para$v, df_update = df_update,
                           tol = tol, conv_measure = conv_measure)
 
   if ((class(estd_model) == "mctfa")) {
@@ -58,11 +62,16 @@ if (!is.null(init_para)) {
   }
 }
 
+# Use k-means, random, and given groupings of observations
+# for parameter estimates.
 if ((nkmeans!=0) || (nrandom!=0) || (!is.null(init_clust))) {
 
+  # The set of all initial partitions
   initial_partitions <- start_clust(Y, g, init_clust, nkmeans, nrandom)
   maxinit <- ncol(initial_partitions)
-  if (is.null(maxinit)) maxinit <- 1
+  if (is.null(maxinit)) 
+    maxinit <- 1
+  # for progress bar
   if (prog == 0) {
     prog = 1/maxinit; tinit = maxinit
   } else {
@@ -71,6 +80,8 @@ if ((nkmeans!=0) || (nrandom!=0) || (!is.null(init_clust))) {
 
   for (ii in 1 : maxinit) {
 
+  # For some initialization methods, having a single sample cluster
+  # can be a problem.
   if (min(table(initial_partitions[, ii])) == 1) {
     when <- paste("At start", ii)
     what <- "Initial partitioning has a single sample cluster."
@@ -78,6 +89,7 @@ if ((nkmeans!=0) || (nrandom!=0) || (!is.null(init_clust))) {
     next
   }
 
+  # Initial estimates of model parameters (same as mcfa)
   init_model_para <- try(init_est_para.mcfa(Y, g, q,
                                             initial_partitions[, ii],
                                             init_method = init_method))
@@ -89,11 +101,15 @@ if ((nkmeans!=0) || (nrandom!=0) || (!is.null(init_clust))) {
     next
   }
 
+  # Initial values for dof
+  init_model_para$v <- df_init
+  init_model_para$df_update <- df_update
+  # EM steps
   estd_model <- est.mctfa(init_para = init_model_para, Y = Y,
-                            v = df_init, df_update = df_update,
-                            itmax = itmax, tol = tol,
-                            conv_measure = conv_measure)
+                          itmax = itmax, tol = tol,
+                          conv_measure = conv_measure)
 
+  # keep the model with highest log-likelihood
   if (class(estd_model) == "mctfa") {
     if (estd_model$logL > maxLOGL) {
       Hmodel <- estd_model
@@ -102,6 +118,7 @@ if ((nkmeans!=0) || (nrandom!=0) || (!is.null(init_clust))) {
     # cat(sprintf("\n g = %i, q = %i, init %i logL %8.4f, maxlogL = %8.4f \n",
     #                 g, q, ii, estd_model$logL, maxLOGL))
   }
+
   if (class(estd_model) == "error") {
     when <- paste("At start", ii)
     what <- estd_model
@@ -117,6 +134,7 @@ if (!exists("Hmodel")) {
   cat("Failed to Estimate a Model. See Error Messages.")
   return(warn_msg)
 }
+# Make A^T A = I_q
 CH <- chol(t(Hmodel$A) %*% Hmodel$A)
 Hmodel$A <- Hmodel$A %*% solve(CH)
 Hmodel$xi <- CH %*% Hmodel$xi

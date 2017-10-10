@@ -8,10 +8,14 @@ pivec <- array(NA, c(1, g))
 
 if (init_method == "randA") {
 
+  # A is drawn from N(0, 1) and 
+  # then made A^T A = I_q.
   A <- matrix(rnorm(p * q), nrow = p, ncol = q)
   C <- chol(t(A) %*% A)
   A <- A %*% solve(C)
 
+  # Diagonal elements of D are the pooled with-in cluster
+  # covariance matrix.
   D <- numeric(p)
   for (i in 1 : g) {
     indices  <- which(start == i)
@@ -38,6 +42,7 @@ if (init_method == "randA") {
     if (q == p) {
       sigma2 <- 0
     } else {
+      # Take only the finite and non-zero eigenvalues
       lamlast <- lambda[(q + 1) : p]
       lamlast <- lamlast[lamlast > 0]
       sigma2 <- mean(lamlast, na.rm = TRUE)
@@ -67,10 +72,12 @@ if (init_method == "eigenA") {
     xi[, i]  <- apply(uiT, 2, mean)
     omega[,, i] <- cov(uiT)
   }
+  # take the mean of finite, non-zero elements eigenvalues
+  # as diagonal elements of D
   sqrt_d <- svd_tY$d[(q + 1) : p]
   sqrt_d <- sqrt_d[!is.na(sqrt_d)]
   sqrt_d <- sqrt_d[sqrt_d > 0]
-  D <- diag(mean(sqrt_d^2))
+  D <- diag(mean(sqrt_d^2), p)
 }
 
 colnames (xi) <- paste0("xi_", 1 : g)

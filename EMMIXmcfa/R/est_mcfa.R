@@ -2,21 +2,21 @@ est.mcfa <- function(init_para, Y, itmax, tol, conv_measure, ...) {
 
 p <- ncol(Y)
 n <- nrow(Y)
-fit <- init_para
 
-fit$logL <- do.call("loglike.mcfa", c(list(Y=Y), fit))
+init_para$logL <- do.call("loglike.mcfa", c(list(Y=Y), init_para))
 
-if ((class(fit$logL) == "try-error") ||
-      (class(fit$logL) == 'character')) {
+if ((class(init_para$logL) == "try-error") ||
+      (class(init_para$logL) == 'character')) {
 
   FIT <- paste('in computing the log-likelihood before EM-steps')
   class(FIT) <- "error"
   return(FIT)
 }
 
+
 for (niter in 1 : itmax) {
 
-  FIT <- do.call('Mstep.mcfa', c(list(Y = Y), fit))
+  FIT <- do.call('Mstep.mcfa', c(list(Y = Y), init_para))
 
   if (class(FIT) == 'error') {
 
@@ -46,13 +46,14 @@ for (niter in 1 : itmax) {
     return(FIT)
   }
 
-  if ((conv_measure == "diff") & (abs(FIT$logL-fit$logL) < tol))
+  if ((conv_measure == "diff") && (abs(FIT$logL - init_para$logL) < tol))
     break
 
-  if ((conv_measure == "ratio") & (abs((FIT$logL-fit$logL)/FIT$logL) < tol))
+  if ((conv_measure == "ratio") && 
+      (abs((FIT$logL - init_para$logL)/FIT$logL) < tol))
     break
 
-  fit <- FIT
+  init_para <- FIT
 }
 
 class(FIT) <- "mcfa"
