@@ -1,37 +1,13 @@
-## Welcome to GitHub Pages
+## MCFA: Mixtures of Common Factor Analyzers
 
-You can use the [editor on GitHub](https://github.com/headpoint/EMMIX-mcfa/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+Fits a mixture of factor analyzers with a common component matrix for the
+factor loadings before the transformation of the latent factors to be
+white noise. It is designed specifically for the task of displaying the
+observed data points in a lower (_q_-dimensional) space, 
+where _q_ is the number of factors adopted in the
+factor-analytic representation of the observed vector.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
-
-### Markdown
-
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/headpoint/EMMIX-mcfa/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+It also provides a greater reduction in the number of parameters in the model.
+Component distributions can either be from the family of multivariate normals
+or from the family of multivariate _t_-distributions.
+Maximum likelihood estimators of model parameters are obtained using the Expectation-Maximization algorithm.
