@@ -11,3 +11,18 @@ It also provides a greater reduction in the number of parameters in the model.
 Component distributions can either be from the family of multivariate normals
 or from the family of multivariate _t_-distributions.
 Maximum likelihood estimators of model parameters are obtained using the Expectation-Maximization algorithm.
+
+Fitting a MCFA model with there components using two factors for the Iris data available in
+R can be done using,  
+```
+fit <- mcfa(Y = iris[, -5], g = 3, q = 2)
+```
+
+The groupings can be visualized in the _q_-dimensional factor space.
+```
+plot_factors(fit)
+```
+MCFA fits multivariate normals to the data, fitting _t_-distributions can be achieved
+using `mctfa` function. Further, there are functions to generate data from a `emmix-mcfa`
+model (`rmix`), estimate factor scores (`factor_scores`), estimate adjusted Rand Index (`ari`),
+find the number of misallocations (`err`), among others.
