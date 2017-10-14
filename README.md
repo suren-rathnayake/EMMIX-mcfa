@@ -24,5 +24,5 @@ plot_factors(fit)
 ```
 MCFA fits multivariate normals to the data, fitting _t_-distributions can be achieved
 using `mctfa` function. Further, there are functions to generate data from a `emmix-mcfa`
-model (`rmix`), estimate factor scores (`factor_scores`), estimate adjusted Rand Index (`ari`),
+models (`rmix`), estimate factor scores (`factor_scores`), estimate adjusted Rand Index (`ari`),
 find the number of misallocations (`err`), among others.
