@@ -7,7 +7,7 @@ if (is.null(init_para$pivec) || is.null(init_para$D))
 if ((model == "mcfa") || (model == "mctfa")) {
 
   if (!all(c("pivec", "A", "xi", "omega", "D") %in% names(init_para))) {
-    cat("Missing paramters in init_para")
+    message("Missing paramters in init_para")
     return (check = FALSE)
   }
 
@@ -15,28 +15,28 @@ if ((model == "mcfa") || (model == "mctfa")) {
         is.null(init_para$xi) || is.null(init_para$omega) ||
         is.null(init_para$D)) {
 
-   cat("One or more paramters in init_para is NULL")
+   message("One or more paramters in init_para is NULL")
    return (check = FALSE)
   }
 
   if ((length(init_para$pivec) != g) || (ncol(init_para$xi) != g) ||
       (dim(init_para$omega)[3] != g)) {
 
-    cat("Paramters for one or more compoents not found in init_para")
+    message("Paramters for one or more compoents not found in init_para")
     return(check = FALSE)
   }
 
   if ((ncol(init_para$A) != q) || (nrow(init_para$xi) != q) ||
       (dim(init_para$omega)[1] != q) || (dim(init_para$omega)[2] != q)) {
 
-        cat("Paramters for one or more factors not found in init_para")
+        message("Paramters for one or more factors not found in init_para")
         return(check = FALSE)
   }
 
   if ((nrow(init_para$A) != p) || (nrow(init_para$D) != p) ||
       (ncol(init_para$D) != p)) {
 
-        cat("The number of variables and init_para are not compatible")
+        message("The number of variables and init_para are not compatible")
         return(check = FALSE)
   }
 }
@@ -45,33 +45,33 @@ if((model=="mfa") || (model=="mtfa")) {
 
   if (!all(c("pivec", "B", "mu", "D") %in% names(init_para))) {
 
-    cat("Missing paramters in init_para")
+    message("Missing paramters in init_para")
     return (check = FALSE)
   }
 
   if (is.null(init_para$pivec) || is.null(init_para$B) ||
       is.null(init_para$mu) || is.null(init_para$D)) {
 
-    cat("One or more paramters in init_para is NULL")
+    message("One or more paramters in init_para is NULL")
     return(check = FALSE)
   }
 
   if ((length(init_para$pivec) != g) || (dim(init_para$mu)[2] != g)) {
 
-    cat("Paramters for one or more compoents not found in init_para")
+    message("Paramters for one or more compoents not found in init_para")
     return(check = FALSE)
   }
 
   if ((ncol(init_para$B) != q)) {
 
-    cat("Number of columns in B in init_para must be equal to q")
+    message("Number of columns in B in init_para must be equal to q")
     return(check = FALSE)
   }
 
   if ((nrow(init_para$B) != p) || (nrow(init_para$D) != p) ||
      (ncol(init_para$D) != p)) {
 
-    cat("The number of variables and init_para are not compatible")
+    message("The number of variables and init_para are not compatible")
     return(check = FALSE)
   }
 }

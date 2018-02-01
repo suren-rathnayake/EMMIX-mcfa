@@ -1,4 +1,4 @@
-factor_scores.mcfa <- function(Y, g, q, pivec, A, xi, omega, D,
+factor_scores_mcfa <- function(Y, g, q, pivec, A, xi, omega, D,
                                tau = NULL, clust = NULL, ...) {
                                
 p <- ncol(Y) 

@@ -63,6 +63,15 @@ if (class(A) == "try-error") {
 
 D <- diag(Di - rowSums((A %*% A2) * A )) / n
 
+# -- make AT A = I 
+# CH <- chol(t(A) %*% A)
+# A <- A %*% solve(CH)
+# xi <- CH %*% xi
+# for (i in 1 : g) {
+#   omega[,,i] <- CH %*% omega[,,i] %*% t(CH)
+# }
+# --
+
 model <- list(g = g, q = q, pivec = pivec, A = A,
               xi = xi, omega = omega, D = D)
 return(model)

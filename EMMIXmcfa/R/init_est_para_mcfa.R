@@ -1,4 +1,4 @@
-init_est_para.mcfa <- function (Y, g, q, start, init_method = "eigenA", ...) {
+init_est_para.mcfa <- function (Y, g, q, start, init_method = "eigen-A", ...){
 
 p <- ncol(Y)
 n <- nrow(Y)
@@ -6,7 +6,7 @@ xi <- array(NA, c(q, g))
 omega <- array(NA, c(q, q, g))
 pivec <- array(NA, c(1, g))
 
-if (init_method == "randA") {
+if (init_method == "rand-A") {
 
   # A is drawn from N(0, 1) and 
   # then made A^T A = I_q.
@@ -39,14 +39,18 @@ if (init_method == "randA") {
     sort.lambda <- sort(eig_list$values, decreasing = TRUE, index.return=TRUE)
     lambda <- sort.lambda$x
     ix_lambda <- sort.lambda$ix
+
     if (q == p) {
+
       sigma2 <- 0
     } else {
+
       # Take only the finite and non-zero eigenvalues
       lamlast <- lambda[(q + 1) : p]
       lamlast <- lamlast[lamlast > 0]
       sigma2 <- mean(lamlast, na.rm = TRUE)
     }
+
     if (q == 1) {
       omega[,, i] <- t(A) %*% sqrt_D %*% H[, ix_lambda[1 : q]] %*%
                       diag((lambda[1 : q] - sigma2), q) %*%
@@ -59,7 +63,7 @@ if (init_method == "randA") {
   }
 }
 
-if (init_method == "eigenA") {
+if (init_method == "eigen-A") {
 
   svd_tY <- svd(t(Y)/ sqrt(n - 1))
   A <- svd_tY$u[, 1 : q, drop = FALSE]
@@ -80,14 +84,29 @@ if (init_method == "eigenA") {
   D <- diag(mean(sqrt_d^2), p)
 }
 
-colnames (xi) <- paste0("xi_", 1 : g)
-dimnames(omega)[[1]] <- paste0("u_", 1 : q)
-dimnames(omega)[[2]] <- paste0("u_", 1 : q)
-dimnames(omega)[[3]] <- paste0("omega_", 1 : g)
-colnames(pivec) <- paste0("pi_", 1 : g)
+if (init_method == "gmf") {
+
+  AB <- gmf(scale(Y), q, maxit = 1000, lambda = 0.01, cor_rate = 0.9)
+
+  svd_of_A <- svd(AB$A)
+  A <- svd_of_A$u
+
+  U <- Y %*% A
+
+  for (i in 1 : g) {
+    
+    indices  <- which(start == i)
+    pivec[i] <- length(indices) / n
+    xi[, i]  <- apply(U[indices,, drop = FALSE], 2, mean)
+    omega[,, i] <- cov(U[indices,, drop = FALSE])
+  }
+
+  D <- diag(apply((Y - U %*% t(A)), 2, var))
+}
 
 model <- list(g = g, q = q, pivec = pivec, A = A, xi = xi,
                       omega = omega, D = D)
+
 class(model) <- 'mcfa'
 return(model)
 }
