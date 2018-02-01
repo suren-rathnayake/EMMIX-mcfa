@@ -1,5 +1,7 @@
 \name{factor_scores}
 \alias{factor_scores}
+\alias{factor_scores.mcfa}
+\alias{factor_scores.mctfa}
 \title{
  Computes Factor Scores.
 }
@@ -8,11 +10,13 @@ This function computes factor scores given a data set and
 a \code{EMMIXmcfa} model.
 }
 \usage{
-factor_scores(Y, model, tau = NULL, clust= NULL, ...)
+factor_scores(model, Y, ...)
+\method{factor_scores}{mcfa}(model, Y, tau = NULL, clust= NULL, ...)
+\method{factor_scores}{mctfa}(model, Y, tau = NULL, clust= NULL, ...)
 }
 \arguments{
   \item{model}{
-  Model of class \code{"mcfa", "mctfa", "mfa"}, or \code{"mtfa"}.
+  Model of class \code{"mcfa"} or \code{"mctfa"}.
 }
   \item{Y}{
   Data matrix with variables in columns in the same order as used in
@@ -85,9 +89,9 @@ Y <- iris[-c(sel_subset), -5]
 Y <- as.matrix(Y)
 clust <- predict(model, Y)
 
-factor_scores <- factor_scores(Y, model)
+fa_scores <- factor_scores(model, Y)
 # Visualizing new data in factor space
-plot_factors(factor_scores, type="Fmat", clust=clust)
+plot_factors(fa_scores, type="Fmat", clust=clust)
 }
 \keyword{ cluster}
 \keyword{ multivariate}

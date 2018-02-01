@@ -88,7 +88,7 @@ Y <- as.matrix(Y)
 clust <- predict(model, Y)
 err(clust, iris[-c(indSample), 5])
 
-fac_scores <- factor_scores(Y, model)
+fac_scores <- factor_scores(model, Y)
 plot_factors (fac_scores, type="Fmat", clust = clust)
 plot_factors (fac_scores, type="Fmat", clust = iris[-c(indSample), 5])
 

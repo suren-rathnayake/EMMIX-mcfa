@@ -5,7 +5,7 @@
 }
 \description{
 Given two vectors each corresponding to a set of categories, 
-this function finds the minimum number of mis-allocations
+this function finds the minimum number of misallocations 
 by rotating the categories.
 }
 \usage{
@@ -21,11 +21,10 @@ err(cls, hat_cls)
 }
 \details{
 Rotates the categories for all possible permutations, and
-returns the minimum number of mis-allocations.
-The number of categories in each set of labels does not need to
-be the same.
-It make take several minutes to compute when the number of categories 
-is large.
+returns the minimum number of misallocations.  
+The number of categories in each set of labels 
+does not need to be the same. It may take several minutes to 
+compute when the number of categories is large.
 }
 \value{
   Integer specifying the minimum number of mis-allocations. 

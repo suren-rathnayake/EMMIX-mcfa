@@ -1,10 +1,12 @@
 \name{mcfa}
 \alias{mcfa}
 \alias{mcfa.default}
-\alias{print.emmixmcfa}
-\alias{summary.emmixmcfa}
-\alias{predict.emmixmcfa}
-\alias{plot.emmixmcfa}
+\alias{print.mcfa}
+\alias{print.mctfa}
+\alias{summary.emmix}
+\alias{predict.mcfa}
+\alias{predict.mctfa}
+\alias{plot.emmix}
 \alias{mctfa}
 \alias{mctfa.default}
 \title{
@@ -19,7 +21,7 @@ using the Expectation--Maximization algorithm.
 MCFA adds the following 
 restrictions to,
 \deqn{
-\Sigma_i= A~ \Omega_i ~A^T + D \quad (i=1,\,\ldots,\,g),
+\Sigma_i= A \Omega_i A^T + D \quad (i=1,\,\ldots,\,g),
 }
 and
 \deqn{
@@ -35,7 +37,7 @@ definite symmetric matrix, and \eqn{D} is a diagonal
 With this representation,
 the component distribution of \eqn{Y_j} is modeled as
 \deqn{
-Y_j = A ~U_{ij} + e_{ij}
+Y_j = A U_{ij} + e_{ij}
 }
 with prob. \eqn{\pi_i (i = 1,\,\ldots,\,g)}
 for \eqn{j = 1,\,\ldots,\,n}, where the (unobservable) factors
@@ -48,18 +50,20 @@ the \eqn{e_{ij}}, which are distributed independently
 \usage{
 mcfa(Y, g, q, ...)
 mctfa(Y, g, q, ...)
-\method{mcfa}{default}(Y, g, q, itmax = 500, nkmeans = 20, nrandom = 20, 
+\method{mcfa}{default}(Y, g, q, itmax = 500, nkmeans = 5, nrandom = 5, 
   tol = 1.e-5, init_clust = NULL, init_para = NULL, 
-  init_method = 'randA', conv_measure = 'diff', 
+  init_method = NULL, conv_measure = 'diff', 
   warn_messages = TRUE, ...) 
-\method{mctfa}{default}(Y, g, q, itmax = 500, nkmeans = 20, nrandom = 20, 
+\method{mctfa}{default}(Y, g, q, itmax = 500, nkmeans = 5, nrandom = 5, 
   tol = 1.e-5, df_init = rep(30, g), df_update = TRUE, 
-  init_clust = NULL, init_para = NULL, init_method = 'randA', 
+  init_clust = NULL, init_para = NULL, init_method = NULL, 
   conv_measure = 'diff', warn_messages = TRUE, ...)
-\method{print}{emmixmcfa}(x, ...)
-\method{summary}{emmixmcfa}(object, ...)
-\method{plot}{emmixmcfa}(x, ...)
-\method{predict}{emmixmcfa}(object, Y, ...)
+\method{print}{mcfa}(x, ...)
+\method{print}{mctfa}(x, ...)
+\method{summary}{emmix}(object, ...)
+\method{plot}{emmix}(x, ...)
+\method{predict}{mctfa}(object, Y, ...)
+\method{predict}{mcfa}(object, Y, ...)
 }
 \arguments{
   \item{Y}{
@@ -130,15 +134,39 @@ Not used.
 }
 }
 \details{
-With the default \code{init_method = "randA"}, initialization of
+With \code{init_method = NULL}, the default,
+model parameters are initilized using all available methods.
+
+The default method for initilizing
+model parameters, \code{init_method = NULL},
+obtain 
+
+\code{init_method = "rand-A"}, initialization of
 the parameters is done by using the procedure in
 Baek et al. (2010) where initial values for elements of 
 \eqn{A} are drawn from the \eqn{N(0, 1)} distribution. 
-With this method, the \strong{columns of the 
-data need to be normalized}.
+This method is appropriate when the columns of the data
+are on the same scale. The 
+\code{init_method = "eigen-A"}
+takes the first \eqn{q} eigen
+vectors of \eqn{Y} as the
+loading matrix \eqn{A}.
+%%#With this method, the \strong{columns of the 
+%%#data need to be normalized}.
+
+If specified, the optional argument \code{init_para} 
+must be a list, 
+or an object of class "mcfa" or "mctfa".
+When fitting an "mcfa" model, only the
+model parameters \code{q}, \code{g},
+\code{pivec}, \code{A}, \code{xi},
+\code{omega}, and \code{D} are extracted from
+\code{init_para}, while addtionaly 
+\code{nu} is extracted for \code{mctfa}.
+Anything else in \code{init_para} will be discarded.
 }
 \value{
-Object of class \code{c("emmixmcfa", "mcfa")} or \code{c("emmixmcfa",
+Object of class \code{c("emmix", "mcfa")} or \code{c("emmix",
 "mctfa")} containing the fitted model parameters is returned.
 Details of the components are as fellows:
  \item{g}{
@@ -216,8 +244,8 @@ Suren Rathnayake, Jangsun Baek, Geoffrey McLachlan
 %% ~~objects to See Also as \code{\link{help}}, ~~~
 %%}
 \examples{
-mcfa_fit <- mcfa(iris[, -5], g = 3, q = 3, 
-              itmax = 250, nkmeans = 5, nrandom = 5, tol = 1.e-5)
+mcfa_fit <- mcfa(iris[, -5], g = 3, q = 3, itmax = 250, 
+                nkmeans = 5, nrandom = 5, tol = 1.e-5)
 
 plot(mcfa_fit)
 }
