@@ -1,5 +1,7 @@
 ## MCFA: Mixtures of Common Factor Analyzers
 
+(NOTE: This pacakge is now incorporated into EMMIXmfa.)
+
 Fits a mixture of factor analyzers with a common component matrix for the
 factor loadings before the transformation of the latent factors to be
 white noise. It is designed specifically for the task of displaying the
